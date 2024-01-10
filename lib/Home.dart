@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:notas_diarias/model/Anotacao.dart';
 import 'package:sqflite/sqflite.dart';
+
+import 'helper/AnotacaoHelper.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -13,6 +16,7 @@ class _HomeState extends State<Home> {
   final _titulo = "Notas Diarias";
   final TextEditingController _tituloController = TextEditingController();
   final TextEditingController _descricaoController = TextEditingController();
+  var _db = AnotacaoHelper();
 
   _exibirTelaCadastro() {
     showDialog(
@@ -59,6 +63,7 @@ class _HomeState extends State<Home> {
               ),
               onPressed: ( ){
                 //Salvar
+                _salvarAnotacao();
                 Navigator.pop(context);
               },
               child: const Text(
@@ -72,6 +77,15 @@ class _HomeState extends State<Home> {
         );
       }
     );
+  }
+
+  _salvarAnotacao() async {
+    String titulo = _tituloController.text;
+    String descricao = _descricaoController.text;
+    String dataAtual = DateTime.now().toString();
+    Anotacao anotacao = Anotacao(titulo, descricao, dataAtual);
+    int resultado = await _db.salvarAnotacao(anotacao);
+    print("Salvar Anotação: ${resultado.toString()}");
   }
 
   @override
