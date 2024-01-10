@@ -11,8 +11,8 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   final _titulo = "Notas Diarias";
-  TextEditingController _tituloController = TextEditingController();
-  TextEditingController _descricaoController = TextEditingController();
+  final TextEditingController _tituloController = TextEditingController();
+  final TextEditingController _descricaoController = TextEditingController();
 
   _exibirTelaCadastro() {
     showDialog(
