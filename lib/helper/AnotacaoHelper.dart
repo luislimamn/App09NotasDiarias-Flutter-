@@ -6,7 +6,7 @@ class AnotacaoHelper {
 
   static final String nomeTabela = "anotacao";
   static final AnotacaoHelper _anotacaoHelper = AnotacaoHelper._internal();
-  late Database _db;
+  Database? _db;
   // late usando em versoes do Flutter com Null Safety
 
   factory AnotacaoHelper(){

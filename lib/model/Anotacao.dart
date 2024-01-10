@@ -1,6 +1,6 @@
 class Anotacao{
 
-  late int id;
+  int? id;
   String titulo;
   String descricao;
   String data;

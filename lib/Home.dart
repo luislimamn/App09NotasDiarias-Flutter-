@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notas_diarias/model/Anotacao.dart';
-import 'package:sqflite/sqflite.dart';
-
-import 'helper/AnotacaoHelper.dart';
+import 'package:notas_diarias/helper/AnotacaoHelper.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -61,8 +59,8 @@ class _HomeState extends State<Home> {
               style: const ButtonStyle(
                 backgroundColor: MaterialStatePropertyAll<Color>(Colors.lightGreen),
               ),
-              onPressed: ( ){
-                //Salvar
+              onPressed: () {
+
                 _salvarAnotacao();
                 Navigator.pop(context);
               },
@@ -82,10 +80,10 @@ class _HomeState extends State<Home> {
   _salvarAnotacao() async {
     String titulo = _tituloController.text;
     String descricao = _descricaoController.text;
-    String dataAtual = DateTime.now().toString();
-    Anotacao anotacao = Anotacao(titulo, descricao, dataAtual);
+    //String dataAtual = DateTime.now().toString();
+    Anotacao anotacao = Anotacao(titulo, descricao, DateTime.now().toString());
     int resultado = await _db.salvarAnotacao(anotacao);
-    print("Salvar Anotação: ${resultado.toString()}");
+    print("Salvar Anotação:" + resultado.toString() );
   }
 
   @override
