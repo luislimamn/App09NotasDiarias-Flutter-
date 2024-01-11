@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -19,12 +20,23 @@ class _HomeState extends State<Home> {
   var _db = AnotacaoHelper();
   List<Anotacao> _anotacoes = [];
 
-  _exibirTelaCadastro() {
+  _exibirTelaCadastro( {Anotacao? anotacao} ) {
+    String textoSalvarAtualizar = "";
+    if(anotacao == null){ //Salvar
+      _tituloController.text = "";
+      _descricaoController.text = "";
+      textoSalvarAtualizar = "Salvar";
+    }else{ //Atualizar
+      _tituloController.text = anotacao.titulo!;
+      _descricaoController.text = anotacao.descricao!;
+      textoSalvarAtualizar = "Atualizar";
+    }
+
     showDialog(
       context: context,
       builder: (context){
         return AlertDialog(
-          title: const Text("Adicionar Anotação"),
+          title: Text("$textoSalvarAtualizar Anotação"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -64,12 +76,12 @@ class _HomeState extends State<Home> {
               ),
               onPressed: () {
 
-                _salvarAnotacao();
+                _salvarAtualizaAnotacao(anotacaoSelecionada: anotacao!);
                 Navigator.pop(context);
               },
-              child: const Text(
-                "Salvar",
-                style: TextStyle(
+              child: Text(
+                textoSalvarAtualizar,
+                style: const TextStyle(
                     color: Colors.white
                 ),
               ),
@@ -93,13 +105,23 @@ class _HomeState extends State<Home> {
     //print("Anotações: " + anotacoesRecuperadas.toString());
   }
 
-  _salvarAnotacao() async {
+  _salvarAtualizaAnotacao( {Anotacao? anotacaoSelecionada} ) async {
     String titulo = _tituloController.text;
     String descricao = _descricaoController.text;
-    //String dataAtual = DateTime.now().toString();
-    Anotacao anotacao = Anotacao(titulo, descricao, DateTime.now().toString());
-    int resultado = await _db.salvarAnotacao(anotacao);
-    //print("Salvar Anotação:" + resultado.toString() );
+
+    if(anotacaoSelecionada == null){ //Salvar
+      Anotacao anotacao = Anotacao(titulo, descricao, DateTime.now().toString());
+      int resultado = await _db.salvarAnotacao(anotacao);
+      if (kDebugMode) {
+        print("Salvar Anotação: $resultado" );
+      }
+    }else{ //Atualizar
+      anotacaoSelecionada.titulo = titulo;
+      anotacaoSelecionada.descricao = descricao;
+      anotacaoSelecionada.data = DateTime.now().toString();
+      int resultado = await _db.atualizarAnotacao(anotacaoSelecionada);
+    }
+
     _tituloController.clear();
     _descricaoController.clear();
     _recuperarAnotacao();
@@ -139,6 +161,35 @@ class _HomeState extends State<Home> {
                   child: ListTile(
                     title: Text("${anotacao.titulo}"),
                     subtitle: Text("${_formatarData(anotacao.data)} - ${anotacao.descricao}"),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        GestureDetector(
+                          onTap: (){
+                            _exibirTelaCadastro(anotacao: anotacao);
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.only(right: 16),
+                            child: Icon(
+                              Icons.edit,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: (){
+
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.only(right: 0),
+                            child: Icon(
+                              Icons.remove_circle,
+                              color: Colors.red,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 );
               }
