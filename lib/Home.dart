@@ -15,6 +15,7 @@ class _HomeState extends State<Home> {
   final TextEditingController _tituloController = TextEditingController();
   final TextEditingController _descricaoController = TextEditingController();
   var _db = AnotacaoHelper();
+  List<Anotacao> _anotacoes = [];
 
   _exibirTelaCadastro() {
     showDialog(
@@ -76,6 +77,19 @@ class _HomeState extends State<Home> {
       }
     );
   }
+  _recuperarAnotacao() async {
+    List anotacoesRecuperadas = await _db.recuperarAnotacao();
+    List<Anotacao> listaTemporaria = [];
+    for( var item in anotacoesRecuperadas){
+      Anotacao anotacao = Anotacao.fromMap(item);
+      listaTemporaria.add(anotacao);
+    }
+    setState(() {
+      _anotacoes = listaTemporaria;
+    });
+    listaTemporaria = [];
+    //print("Anotações: " + anotacoesRecuperadas.toString());
+  }
 
   _salvarAnotacao() async {
     String titulo = _tituloController.text;
@@ -83,19 +97,45 @@ class _HomeState extends State<Home> {
     //String dataAtual = DateTime.now().toString();
     Anotacao anotacao = Anotacao(titulo, descricao, DateTime.now().toString());
     int resultado = await _db.salvarAnotacao(anotacao);
-    print("Salvar Anotação:" + resultado.toString() );
+    //print("Salvar Anotação:" + resultado.toString() );
+    _tituloController.clear();
+    _descricaoController.clear();
+    _recuperarAnotacao();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _recuperarAnotacao();
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_titulo),
         backgroundColor: Colors.lightGreen,
         foregroundColor: Colors.white,
       ),
-      body: Container(
-
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: ListView.builder(
+              itemCount: _anotacoes.length,
+              itemBuilder: (context, index){
+                final anotacao = _anotacoes[index];
+                return Card(
+                  child: ListTile(
+                    title: Text("${anotacao.titulo}"),
+                    subtitle: Text("${anotacao.data} - ${anotacao.descricao}"),
+                  ),
+                );
+              }
+            )
+          )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.lightGreen,
