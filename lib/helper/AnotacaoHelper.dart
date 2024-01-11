@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../model/Anotacao.dart';
@@ -62,6 +64,15 @@ class AnotacaoHelper {
       anotacao.toMap(),
       where: "id = ?",
       whereArgs: [anotacao.id]
+    );
+  }
+
+  Future<int> removerAnotacao(int id) async {
+    var bancoDados = await db;
+    return await bancoDados.delete(
+        nomeTabela,
+        where: "id = ?",
+        whereArgs: [id]
     );
   }
 

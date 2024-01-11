@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -17,7 +18,7 @@ class _HomeState extends State<Home> {
   final _titulo = "Notas Diarias";
   final TextEditingController _tituloController = TextEditingController();
   final TextEditingController _descricaoController = TextEditingController();
-  var _db = AnotacaoHelper();
+  final _db = AnotacaoHelper();
   List<Anotacao> _anotacoes = [];
 
   _exibirTelaCadastro( {Anotacao? anotacao} ) {
@@ -120,6 +121,9 @@ class _HomeState extends State<Home> {
       anotacaoSelecionada.descricao = descricao;
       anotacaoSelecionada.data = DateTime.now().toString();
       int resultado = await _db.atualizarAnotacao(anotacaoSelecionada);
+      if (kDebugMode) {
+        print("Salvar Anotação: $resultado" );
+      }
     }
 
     _tituloController.clear();
@@ -133,10 +137,16 @@ class _HomeState extends State<Home> {
     String dataFormatada = formatador.format(dataConvertida);
     return dataFormatada;
   }
+  _removerAnotacao(int? id) async {
+    int resultado = await _db.removerAnotacao(id!);
+    if (kDebugMode) {
+      print("Salvar Anotação: $resultado" );
+    }
+    _recuperarAnotacao();
+  }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperarAnotacao();
   }
@@ -178,7 +188,7 @@ class _HomeState extends State<Home> {
                         ),
                         GestureDetector(
                           onTap: (){
-
+                            _removerAnotacao(anotacao.id);
                           },
                           child: const Padding(
                             padding: EdgeInsets.only(right: 0),
